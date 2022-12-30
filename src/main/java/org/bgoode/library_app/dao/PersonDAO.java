@@ -1,5 +1,6 @@
 package org.bgoode.library_app.dao;
 
+import org.bgoode.library_app.models.Book;
 import org.bgoode.library_app.models.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -40,6 +41,9 @@ public class PersonDAO {
         jdbcTemplate.update("DELETE FROM Person WHERE id=?", id);
     }
 
+    public List<Book> getBooksByPersonId(int id) {
+       return jdbcTemplate.query("SELECT * FROM Book WHERE person_id=?", new BeanPropertyRowMapper<>(Book.class), id);
+    }
 
 
 }

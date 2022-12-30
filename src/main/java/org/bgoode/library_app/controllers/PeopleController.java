@@ -5,9 +5,11 @@ import org.bgoode.library_app.models.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -23,15 +25,15 @@ public class PeopleController {
     }
 
     @GetMapping()
-    public String index(Model model, HttpServletRequest request) {
+    public String index(Model model) {
         model.addAttribute("people", personDAO.index());
 
         return "people/index";
     }
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model) {
-        System.out.println("controller show");
         model.addAttribute("person", personDAO.show(id));
+        model.addAttribute("books", personDAO.getBooksByPersonId(id));
         return "people/show";
     }
    @GetMapping("/new")
@@ -39,7 +41,8 @@ public class PeopleController {
         return "people/new";
     }
     @PostMapping
-    public String create(@ModelAttribute("person") Person person) {
+    public String create(@ModelAttribute("person") @Valid Person person, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) return "people/new";
         personDAO.save(person);
         return "redirect:/people";
     }
@@ -50,7 +53,9 @@ public class PeopleController {
         return "people/edit";
     }
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("person") Person person, @PathVariable("id") int id) {
+    public String update(@ModelAttribute("person") @Valid Person person, @PathVariable("id") int id,
+                         BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) return "people/edit";
         personDAO.update(person, id);
         return "redirect:/people";
     }
